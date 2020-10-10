@@ -1,0 +1,111 @@
+<Sysmon schemaversion="4.40">
+  <!--
+    ____   _____ _     _             _______                    _          ___   ___ ___   ___                                  
+ |  _ \ / ____(_)   | |           |__   __|                  | |        |__ \ / _ \__ \ / _ \                                 
+ | |_) | (___  _  __| | ___  ___     | | ___  _ __ ___  _ __ | |_ ___      ) | | | | ) | | | |                                
+ |  _ < \___ \| |/ _` |/ _ \/ __|    | |/ _ \| '__/ _ \| '_ \| __/ _ \    / /| | | |/ /| | | |                                
+ | |_) |____) | | (_| |  __/\__ \    | | (_) | | | (_) | | | | || (_) |  / /_| |_| / /_| |_| |                                
+ |____/|_____/|_|\__,_|\___||___/    |_|\___/|_|__\___/|_| |_|\__\___/  |____|\___/____|\___/   _           _   _             
+ |  __ \               | |           (_)       |  __ \                             |_   _|     (_)         | | (_)            
+ | |__) |_      ___ __ | |_ __ _ _ __ _  ___   | |__) | __ ___   ___ ___  ___ ___    | |  _ __  _  ___  ___| |_ _  ___  _ __  
+ |  ___/\ \ /\ / / '_ \| __/ _` | '__| |/ _ \  |  ___/ '__/ _ \ / __/ _ \/ __/ __|   | | | '_ \| |/ _ \/ __| __| |/ _ \| '_ \ 
+ | |     \ V  V /| | | | || (_| | |  | | (_) | | |   | | | (_) | (_|  __/\__ \__ \  _| |_| | | | |  __/ (__| |_| | (_) | | | |
+ |_|____  \_/\_/ |_| |_|\__\__,_|_|  |_|\___/__|_|   |_|  \___/_\___\___||___/___/ |_____|_| |_| |\___|\___|\__|_|\___/|_| |_|
+  / ____|                                  / ____|           / _(_)                           _/ |                            
+ | (___  _   _ ___ _ __ ___   ___  _ __   | |     ___  _ __ | |_ _  __ _                     |__/                             
+  \___ \| | | / __| '_ ` _ \ / _ \| '_ \  | |    / _ \| '_ \|  _| |/ _` |                                                     
+  ____) | |_| \__ \ | | | | | (_) | | | | | |___| (_) | | | | | | | (_| |                                                     
+ |_____/ \__, |___/_| |_| |_|\___/|_| |_|  \_____\___/|_| |_|_| |_|\__, |                                                     
+          __/ |                                                     __/ |                                                     
+         |___/                                                     |___/                                                      
+  -->
+  <HashAlgorithms>*</HashAlgorithms>
+  <!-- Checking for signature revocation for drivers. -->
+  <CheckRevocation/>
+  <EventFiltering>
+    <RuleGroup name="" groupRelation="and">
+      <CreateRemoteThread onmatch="include">
+        <!-- Change the below directory to match where your compiled projects are --> 
+        <SourceImage name="" condition="begin with">C:\Users\User\Desktop\</SourceImage>
+        <SourceImage name="" condition="contains">MessageBoxCSharp</SourceImage>
+      </CreateRemoteThread>
+    </RuleGroup>
+    <RuleGroup name="" groupRelation="or">
+      <ImageLoad onmatch="include">
+        <Rule name="Suspicious .NET Compilation" groupRelation="and">
+          <Image name="" condition="excludes any">C:\Windows;C:\Program Files;C:\ProgramData\Microsoft\Windows Defender\</Image>
+          <ImageLoaded name="" condition="contains any">clrjit.dll;clr.dll</ImageLoaded>
+        </Rule>
+      </ImageLoad>
+    </RuleGroup>
+    <RuleGroup name="" groupRelation="or">
+      <ProcessCreate onmatch="include">
+      </ProcessCreate>
+    </RuleGroup>
+    <RuleGroup name="" groupRelation="or">
+      <FileCreateTime onmatch="include">
+      </FileCreateTime>
+    </RuleGroup>
+    <RuleGroup name="" groupRelation="or">
+      <NetworkConnect onmatch="include">
+        <Image name="" condition="contains">StagedPayloads.exe</Image>
+      </NetworkConnect>
+    </RuleGroup>
+    <RuleGroup name="" groupRelation="or">
+      <ProcessTerminate onmatch="include">
+      </ProcessTerminate>
+    </RuleGroup>
+    <RuleGroup name="" groupRelation="or">
+      <DriverLoad onmatch="include">
+      </DriverLoad>
+    </RuleGroup>
+    <RuleGroup name="" groupRelation="or">
+      <RawAccessRead onmatch="include">
+      </RawAccessRead>
+    </RuleGroup> 
+    <RuleGroup name="" groupRelation="or">
+      <ProcessAccess onmatch="include">
+        <CallTrace name="CreateProcessA - Suspended" condition="contains">KERNEL32.DLL+1c754</CallTrace>
+        <Rule name="Suspicious Injection" groupRelation="and">
+          <CallTrace name="" condition="contains">UNKNOWN</CallTrace>
+          <GrantedAccess name="" condition="is">0x1FFFFF</GrantedAccess>
+        </Rule>
+        <Rule groupRelation="and" name="Injection from Suspicious Directory">
+          <SourceImage condition="excludes any">C:\Windows;C:\Program Files;C:\ProgramData\Microsoft\Windows Defender\</SourceImage>
+          <CallTrace condition="begin with">C:\Windows\SYSTEM32\ntdll.dll</CallTrace>
+        </Rule>
+      </ProcessAccess>
+    </RuleGroup>
+    <RuleGroup name="" groupRelation="or">
+      <FileCreate onmatch="include">
+        <TargetFilename name="CSharp Dynamic Compilation File Drop" condition="end with">.cs</TargetFilename>
+        <TargetFilename name="CLR Usage Logs" condition="contains">\AppData\Local\Microsoft\CLR</TargetFilename>
+      </FileCreate>
+    </RuleGroup>
+    <RuleGroup name="" groupRelation="or">
+      <RegistryEvent onmatch="include">
+      </RegistryEvent>
+    </RuleGroup>
+    <RuleGroup name="" groupRelation="or">
+      <FileCreateStreamHash onmatch="include">
+      </FileCreateStreamHash>
+    </RuleGroup>
+  <RuleGroup name="" groupRelation="or">
+    <PipeEvent onmatch="include">
+    </PipeEvent>
+  </RuleGroup>
+  <RuleGroup name="" groupRelation="or">
+    <WmiEvent onmatch="include">
+    </WmiEvent>
+  </RuleGroup>
+  <RuleGroup name="" groupRelation="or">
+    <DnsQuery onmatch="include">
+      <Image name="" condition="contains">StagedPayloads.exe</Image>
+    </DnsQuery>
+  </RuleGroup>
+  <RuleGroup name="" groupRelation="or">
+    <FileDelete onmatch="include">
+    </FileDelete>
+  </RuleGroup>
+  </EventFiltering>
+</Sysmon>
