@@ -1,0 +1,6 @@
+1) Download Sysmon64.exe and BSides-Sysmon.xml from https://github.com/pwntario/bsidesto2020-public
+2) Save the files in the same directory
+3) Open an administrative command prompt
+4) Navigate to the directory where your Sysmon64.exe and BSides-Sysmon.xml are saved
+5) Run: Sysmon64.exe -i BSides-Sysmon.xml -accepteula
+6) To Update the Sysmon Config: Sysmon64.exe -c BSides-Sysmon.xml
