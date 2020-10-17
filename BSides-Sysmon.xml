@@ -65,6 +65,7 @@
     </RuleGroup> 
     <RuleGroup name="" groupRelation="or">
       <ProcessAccess onmatch="include">
+        <CallTrace name="CreateProcessA - Suspended WOW64" condition="contains">KERNELBASE.dll+1b928c</CallTrace>
         <CallTrace name="CreateProcessA - Suspended" condition="contains">KERNEL32.DLL+1c754</CallTrace>
         <Rule name="Suspicious Injection" groupRelation="and">
           <CallTrace name="" condition="contains">UNKNOWN</CallTrace>
